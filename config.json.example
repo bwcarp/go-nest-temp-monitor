@@ -1,0 +1,36 @@
+{
+    "influx": {
+        "hostname": "127.0.0.1",
+        "port": 8086,
+        "protocol": "http",
+        "database": "nest",
+        "username": "",
+        "password": ""
+    },
+    "nest": {
+        "enable": true,
+        "interval": 5,
+        "project_id": "",
+        "client_id": "",
+        "client_secret": "",
+        "refresh_token": "",
+        "redirect_uri": ""
+    },
+    "accuweather": {
+        "enable": false,
+        "interval": 30,
+        "apikey": "",
+        "locationkey": "338659"
+    },
+    "openweathermap": {
+        "enable": false,
+        "interval": 10,
+        "appid": "",
+        "cityid": "4832294"
+    },
+    "weather.gov": {
+        "enable": true,
+        "interval": 10,
+        "station": "KBOS"
+    }
+}
