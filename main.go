@@ -17,9 +17,10 @@ import (
 
 func main() {
 
-	var configFile string
-	flag.StringVar(&configFile, "c", "./config.json", "Specify path to config.json")
-	config := configuration.GetConfig(configFile)
+	var configFile = flag.String("c", "./config.json", "Specify path to config.json")
+	flag.Parse()
+
+	config := configuration.GetConfig(*configFile)
 	database := config.InfluxConfig.Database
 	influxURL, _ := url.Parse(
 		fmt.Sprintf(
