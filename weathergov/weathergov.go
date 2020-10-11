@@ -55,34 +55,28 @@ func WriteWeather(
 			log.Print(jsonErr)
 		} else {
 
-			var temperature float64
-			var humidity float64
-			var pressure float64
+			var fields = make(map[string]interface{})
 
 			// weather.gov sometimes reports a value of 0 when it doesn't have data.
 			// Given that 0 humidity never happens, 0 pressure means we all die,
 			// and a floating point value being exactly 0 for temperature is rare,
 			// it's better to pass null values instead.
 			timestamp, _ := time.Parse(time.RFC3339, weather.Properties.Timestamp)
-			if weather.Properties.Temperature.Value != 0 {
-				temperature = weather.Properties.Temperature.Value
+			if weather.Properties.Temperature.Value > 0 {
+				fields["temperature"] = weather.Properties.Temperature.Value
 			}
-			if weather.Properties.Humidity.Value != 0 {
-				humidity = weather.Properties.Humidity.Value
+			if weather.Properties.Humidity.Value > 0 {
+				fields["humidity"] = weather.Properties.Humidity.Value
 			}
-			if weather.Properties.Pressure.Value != 0 {
+			if weather.Properties.Pressure.Value > 0 {
 				// Convert Pa to hPa for consistency with other apps
-				pressure = weather.Properties.Pressure.Value * 0.01
+				fields["pressure"] = weather.Properties.Pressure.Value * 0.01
 			}
 
 			pts := make([]influxClient.Point, 1)
 			pts[0] = influxClient.Point{
 				Measurement: "weathergov",
-				Fields: map[string]interface{}{
-					"temperature": temperature,
-					"humidity":    humidity,
-					"pressure":    pressure,
-				},
+				Fields:      fields,
 				Tags: map[string]string{
 					"station": config.Station,
 				},
