@@ -211,10 +211,10 @@ func WriteNest(influx *influxClient.Client, database string) {
 					log.Println("ERROR: Could not write data point!")
 					log.Print(bps)
 					log.Print(err)
+				} else {
+					log.Printf("Wrote thermostat metrics. Sleeping for %d minute(s).\n", Interval)
 				}
 			}
-
-			log.Printf("Wrote thermostat metrics. Sleeping for %d minute(s).\n", Interval)
 			time.Sleep(time.Minute * Interval)
 		}
 	}

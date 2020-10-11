@@ -39,7 +39,7 @@ mkdir -p ~/go/src
 cd ~/go/src
 git clone https://github.com/blakehartshorn/go-nest-temp-monitor.git
 cd go-nest-temp-monitor
-go build main.go
+go build go-nest-temp-monitor.go
 ```
 Copy the binary to where you would prefer to run it from.
 

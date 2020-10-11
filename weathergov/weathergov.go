@@ -55,11 +55,25 @@ func WriteWeather(
 			log.Print(jsonErr)
 		} else {
 
+			var temperature float64
+			var humidity float64
+			var pressure float64
+
+			// weather.gov sometimes reports a value of 0 when it doesn't have data.
+			// Given that 0 humidity never happens, 0 pressure means we all die,
+			// and a floating point value being exactly 0 for temperature is rare,
+			// it's better to pass null values instead.
 			timestamp, _ := time.Parse(time.RFC3339, weather.Properties.Timestamp)
-			temperature := weather.Properties.Temperature.Value
-			humidity := weather.Properties.Humidity.Value
-			// Convert Pa to hPa for consistency with other apps
-			pressure := weather.Properties.Pressure.Value * 0.01
+			if weather.Properties.Temperature.Value != 0 {
+				temperature = weather.Properties.Temperature.Value
+			}
+			if weather.Properties.Humidity.Value != 0 {
+				humidity = weather.Properties.Humidity.Value
+			}
+			if weather.Properties.Pressure.Value != 0 {
+				// Convert Pa to hPa for consistency with other apps
+				pressure = weather.Properties.Pressure.Value * 0.01
+			}
 
 			pts := make([]influxClient.Point, 1)
 			pts[0] = influxClient.Point{
@@ -84,9 +98,10 @@ func WriteWeather(
 				log.Println("ERROR: Could not write data point!")
 				log.Print(bps)
 				log.Print(err)
+			} else {
+				log.Printf("Wrote weather metrics from weather.gov. Sleeping for %d minute(s).\n", config.Interval)
 			}
 		}
-		log.Printf("Wrote weather metrics from weather.gov. Sleeping for %d minute(s).\n", config.Interval)
 		time.Sleep(time.Minute * time.Duration(config.Interval))
 	}
 }

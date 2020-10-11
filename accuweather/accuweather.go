@@ -80,9 +80,10 @@ func WriteWeather(
 				log.Println("ERROR: Could not write data point!")
 				log.Print(bps)
 				log.Print(err)
+			} else {
+				log.Printf("Wrote weather metrics from AccuWeather. Sleeping for %d minute(s).\n", config.Interval)
 			}
 		}
-		log.Printf("Wrote weather metrics from AccuWeather. Sleeping for %d minute(s).\n", config.Interval)
 		time.Sleep(time.Minute * time.Duration(config.Interval))
 	}
 }
