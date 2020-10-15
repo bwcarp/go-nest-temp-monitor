@@ -62,7 +62,7 @@ func WriteWeather(
 			// and a floating point value being exactly 0 for temperature is rare,
 			// it's better to pass null values instead.
 			timestamp, _ := time.Parse(time.RFC3339, weather.Properties.Timestamp)
-			if weather.Properties.Temperature.Value > 0 {
+			if weather.Properties.Temperature.Value != 0 {
 				fields["temperature"] = weather.Properties.Temperature.Value
 			}
 			if weather.Properties.Humidity.Value > 0 {
