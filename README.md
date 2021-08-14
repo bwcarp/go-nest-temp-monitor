@@ -73,6 +73,13 @@ SyslogIdentifier=nest
 WantedBy=multi-user.target
 ```
 
+## Running as container
+
+```
+docker build --rm -t go-nest-temp-monitor:latest .
+docker run --rm -it -v `pwd`/config.json:/app/config.json go-nest-temp-monitor:latest
+```
+
 ## Graphing
 There are two popular solutions for graphing metrics with InfluxDB and both are easy to setup. Default configs aren't provided here, but get creative and lay the data out how you want it.
 * Grafana: https://github.com/grafana/grafana
