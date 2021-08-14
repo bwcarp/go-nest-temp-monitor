@@ -1,0 +1,16 @@
+[Unit]
+Description=Nest Thermostat Monitor
+After=network.target
+Requires=network.target
+
+[Service]
+User=pi
+Group=pi
+ExecStart=/home/pi/home-energy-monitor/go-nest-temp-monitor/go-nest-temp-monitor -c /home/pi/home-energy-monitor/go-nest-temp-monitor/config.json
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=nest
+
+[Install]
+WantedBy=multi-user.target
+

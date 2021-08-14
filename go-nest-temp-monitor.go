@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go-nest-temp-monitor/accuweather"
-	"go-nest-temp-monitor/configuration"
-	"go-nest-temp-monitor/nest"
-	"go-nest-temp-monitor/openweathermap"
-	"go-nest-temp-monitor/weathergov"
+	"github.com/blakehartshorn/go-nest-temp-monitor/accuweather"
+	"github.com/blakehartshorn/go-nest-temp-monitor/configuration"
+	"github.com/blakehartshorn/go-nest-temp-monitor/nest"
+	"github.com/blakehartshorn/go-nest-temp-monitor/openweathermap"
+	"github.com/blakehartshorn/go-nest-temp-monitor/weathergov"
 	"log"
 	"net/url"
 	"time"
@@ -34,6 +34,7 @@ func main() {
 		URL:      *influxURL,
 		Username: config.InfluxConfig.Username,
 		Password: config.InfluxConfig.Password,
+                UnsafeSsl: config.InfluxConfig.UnsafeSsl,
 	}
 
 	influxCon, err := influxClient.NewClient(influxConf)

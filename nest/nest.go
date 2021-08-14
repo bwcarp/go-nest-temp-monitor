@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"go-nest-temp-monitor/configuration"
+	"github.com/blakehartshorn/go-nest-temp-monitor/configuration"
 	"io/ioutil"
 	"log"
 	"net/http"

@@ -23,6 +23,7 @@ type InfluxConfig struct {
 	Database string `json:"database"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+        UnsafeSsl bool  `json:"unsafessl"`
 }
 
 // NestConfig - Google Nest configuration
