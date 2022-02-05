@@ -42,7 +42,9 @@ func WriteWeather(
 		httpClient := &http.Client{Timeout: time.Second * 10}
 		res, err := httpClient.Get(url)
 		if err != nil {
-			log.Print(err)
+			log.Printf("ERROR while featching weather.gov data: %s\n", err)
+			time.Sleep(time.Minute * time.Duration(config.Interval))
+			continue
 		}
 		defer res.Body.Close()
 

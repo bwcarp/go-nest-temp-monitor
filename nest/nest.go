@@ -106,8 +106,9 @@ func RefreshLogin() {
 			bytes.NewBuffer(postData),
 		)
 		if err != nil {
-			log.Println("ERROR: Could not login to Google.")
-			log.Fatal(err)
+			log.Printf("ERROR: Could not login to Google (%s)\n", err)
+			time.Sleep(time.Minute * 5)
+			continue
 		}
 		var authData Authorization
 		body, _ := ioutil.ReadAll(res.Body)
@@ -138,8 +139,9 @@ func WriteNest(influx *influxClient.Client, database string) {
 		httpClient := &http.Client{Timeout: time.Second * 10}
 		res, err := httpClient.Do(req)
 		if err != nil {
-			log.Println("ERROR: Could not get device info from server.")
-			log.Fatal(err)
+			log.Printf("ERROR: Could not get device info from server (%s)\n", err)
+			time.Sleep(time.Minute * Interval)
+			continue
 		}
 
 		var NestDevices Devices
