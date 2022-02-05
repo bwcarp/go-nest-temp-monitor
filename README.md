@@ -1,6 +1,9 @@
 # go-nest-temp-monitor
 This is a small daemon for gathering Nest thermostat data and comparing it to different weather sites. It writes to InfluxDB using the influxdb1 client in Go.
 
+## Deprecated in favor of new project
+See [go-thermonstat-monitor](https://github.com/blakehartshorn/go-thermostat-monitor) for the latest version that uses InfluxDB2 and also features Ecobee support.
+
 #### Celsius vs Fahrenheit
 All metrics for all components of this app are collected in celsius because it is standard across all services. You can get fahrenheit in your influx queries and this works in Grafana as well:
 ```
