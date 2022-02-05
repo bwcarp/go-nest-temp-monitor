@@ -2,17 +2,15 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/blakehartshorn/go-nest-temp-monitor/accuweather"
 	"github.com/blakehartshorn/go-nest-temp-monitor/configuration"
 	"github.com/blakehartshorn/go-nest-temp-monitor/nest"
 	"github.com/blakehartshorn/go-nest-temp-monitor/openweathermap"
 	"github.com/blakehartshorn/go-nest-temp-monitor/weathergov"
 	"log"
-	"net/url"
 	"time"
 
-	influxClient "github.com/influxdata/influxdb1-client"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 )
 
 func main() {
@@ -21,50 +19,40 @@ func main() {
 	flag.Parse()
 
 	config := configuration.GetConfig(*configFile)
-	database := config.InfluxConfig.Database
-	influxURL, _ := url.Parse(
-		fmt.Sprintf(
-			"%s://%s:%d",
-			config.InfluxConfig.Protocol,
-			config.InfluxConfig.Hostname,
-			config.InfluxConfig.Port,
-		),
-	)
-	influxConf := influxClient.Config{
-		URL:      *influxURL,
-		Username: config.InfluxConfig.Username,
-		Password: config.InfluxConfig.Password,
-                UnsafeSsl: config.InfluxConfig.UnsafeSsl,
-	}
 
-	influxCon, err := influxClient.NewClient(influxConf)
-	if err != nil {
-		log.Print("Could not connect to InfluxDB")
-		log.Fatal(err)
-	}
+	influxClient := influxdb2.NewClientWithOptions(
+		config.InfluxConfig.URL, config.InfluxConfig.Token,
+		influxdb2.DefaultOptions().
+			SetBatchSize(config.InfluxConfig.BatchSize).
+			SetFlushInterval(config.InfluxConfig.FlushInt*1000).
+			SetPrecision(time.Second))
+	defer influxClient.Close()
+
+	influxWriter := influxClient.WriteAPI(
+		config.InfluxConfig.Org, config.InfluxConfig.Bucket)
+	defer influxWriter.Flush()
 
 	if config.NestConfig.Enabled == true {
 		nest.Initialize(config.NestConfig)
 		go nest.RefreshLogin()
 		time.Sleep(time.Second * 10)
-		go nest.WriteNest(influxCon, database)
+		go nest.WriteNest(influxWriter)
 	}
 
 	if config.AccuWeatherConfig.Enabled == true {
-		go accuweather.WriteWeather(config.AccuWeatherConfig, influxCon, database)
+		go accuweather.WriteWeather(config.AccuWeatherConfig, influxWriter)
 	}
 
 	if config.OpenWeatherMapConfig.Enabled == true {
-		go openweathermap.WriteWeather(config.OpenWeatherMapConfig, influxCon, database)
+		go openweathermap.WriteWeather(config.OpenWeatherMapConfig, influxWriter)
 	}
 
 	if config.WeatherGovConfig.Enabled == true {
-		go weathergov.WriteWeather(config.WeatherGovConfig, influxCon, database)
+		go weathergov.WriteWeather(config.WeatherGovConfig, influxWriter)
 	}
 
 	for {
 		time.Sleep(time.Hour)
-		log.Print("Keep alive")
+		log.Println("Keep alive")
 	}
-
 }

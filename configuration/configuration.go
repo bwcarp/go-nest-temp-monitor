@@ -17,13 +17,12 @@ type ConfigRoot struct {
 
 // InfluxConfig - InfluxDB configuration
 type InfluxConfig struct {
-	Hostname string `json:"hostname"`
-	Port     int    `json:"port"`
-	Protocol string `json:"protocol"`
-	Database string `json:"database"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-        UnsafeSsl bool  `json:"unsafessl"`
+	URL       string `json:"url"`
+	Token     string `json:"token"`
+	Org       string `json:"org"`
+	Bucket    string `json:"bucket"`
+	BatchSize uint   `json:"batch_size"`
+	FlushInt  uint   `json:"flush_interval_sec"`
 }
 
 // NestConfig - Google Nest configuration

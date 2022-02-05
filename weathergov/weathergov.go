@@ -9,7 +9,8 @@ import (
 	"net/http"
 	"time"
 
-	influxClient "github.com/influxdata/influxdb1-client"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/influxdata/influxdb-client-go/v2/api"
 )
 
 // Response - root of JSON object returned by weather.gov
@@ -32,8 +33,7 @@ type Weather struct {
 // WriteWeather - write weather metrics to InfluxDB
 func WriteWeather(
 	config configuration.WeatherGovConfig,
-	influx *influxClient.Client,
-	database string) {
+	influx api.WriteAPI) {
 	url := fmt.Sprintf(
 		"https://api.weather.gov/stations/%s/observations/latest",
 		config.Station,
@@ -73,28 +73,14 @@ func WriteWeather(
 				fields["pressure"] = weather.Properties.Pressure.Value * 0.01
 			}
 
-			pts := make([]influxClient.Point, 1)
-			pts[0] = influxClient.Point{
-				Measurement: "weathergov",
-				Fields:      fields,
-				Tags: map[string]string{
+			p := influxdb2.NewPoint("weathergov",
+				map[string]string{
 					"station": config.Station,
 				},
-				Time:      timestamp,
-				Precision: "rfc3339",
-			}
-			bps := influxClient.BatchPoints{
-				Points:   pts,
-				Database: database,
-			}
-			_, err = influx.Write(bps)
-			if err != nil {
-				log.Println("ERROR: Could not write data point!")
-				log.Print(bps)
-				log.Print(err)
-			} else {
-				log.Printf("Wrote weather metrics from weather.gov. Sleeping for %d minute(s).\n", config.Interval)
-			}
+				fields, timestamp)
+			influx.WritePoint(p)
+
+			log.Printf("Wrote weather metrics from weather.gov. Sleeping for %d minute(s).\n", config.Interval)
 		}
 		time.Sleep(time.Minute * time.Duration(config.Interval))
 	}

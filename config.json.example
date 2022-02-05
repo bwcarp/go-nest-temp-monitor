@@ -1,11 +1,11 @@
 {
     "influx": {
-        "hostname": "127.0.0.1",
-        "port": 8086,
-        "protocol": "http",
-        "database": "nest",
-        "username": "",
-        "password": ""
+        "url": "http://127.0.0.1:8086",
+        "token": "",
+        "org": "",
+        "bucket": "",
+        "batch_size": 10,
+        "flush_interval_sec": 5
     },
     "nest": {
         "enable": true,

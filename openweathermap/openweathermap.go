@@ -9,7 +9,8 @@ import (
 	"net/http"
 	"time"
 
-	influxClient "github.com/influxdata/influxdb1-client"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/influxdata/influxdb-client-go/v2/api"
 )
 
 // Response - Parse openweathermap json output
@@ -29,8 +30,7 @@ type Response struct {
 // WriteWeather - write weather metrics to InfluxDB
 func WriteWeather(
 	config configuration.OpenWeatherMapConfig,
-	influx *influxClient.Client,
-	database string) {
+	influx api.WriteAPI) {
 	url := fmt.Sprintf(
 		"https://api.openweathermap.org/data/2.5/weather?id=%s&appid=%s&units=metric",
 		config.CityID,
@@ -53,33 +53,20 @@ func WriteWeather(
 			log.Print(jsonErr)
 		} else {
 
-			pts := make([]influxClient.Point, 1)
-			pts[0] = influxClient.Point{
-				Measurement: "openweathermap",
-				Fields: map[string]interface{}{
+			p := influxdb2.NewPoint("openweathermap",
+				map[string]string{
+					"city": weather.City,
+					"country": weather.Sys.Country,
+				},
+				map[string]interface{}{
 					"temperature": weather.Weather.Temperature,
 					"humidity":    weather.Weather.Humidity,
 					"pressure":    weather.Weather.Pressure,
 				},
-				Tags: map[string]string{
-					"city":    weather.City,
-					"country": weather.Sys.Country,
-				},
-				Time:      time.Unix(weather.Timestamp, 0),
-				Precision: "rfc3339",
-			}
-			bps := influxClient.BatchPoints{
-				Points:   pts,
-				Database: database,
-			}
-			_, err = influx.Write(bps)
-			if err != nil {
-				log.Println("ERROR: Could not write data point!")
-				log.Print(bps)
-				log.Print(err)
-			} else {
-				log.Printf("Wrote weather metrics from openweathermap. Sleeping for %d minute(s).\n", config.Interval)
-			}
+				time.Unix(weather.Timestamp, 0))
+			influx.WritePoint(p)
+
+			log.Printf("Wrote weather metrics from openweathermap. Sleeping for %d minute(s).\n", config.Interval)
 		}
 		time.Sleep(time.Minute * time.Duration(config.Interval))
 	}

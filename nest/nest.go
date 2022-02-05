@@ -10,7 +10,8 @@ import (
 	"net/http"
 	"time"
 
-	influxClient "github.com/influxdata/influxdb1-client"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/influxdata/influxdb-client-go/v2/api"
 )
 
 // JSON types
@@ -123,7 +124,7 @@ func RefreshLogin() {
 }
 
 // WriteNest - parse and write thermostat data to influx
-func WriteNest(influx *influxClient.Client, database string) {
+func WriteNest(influx api.WriteAPI) {
 	url := fmt.Sprintf(
 		"https://smartdevicemanagement.googleapis.com/v1/enterprises/%s/devices",
 		ProjectID,
@@ -152,8 +153,7 @@ func WriteNest(influx *influxClient.Client, database string) {
 			log.Fatal(err)
 		}
 
-		pts := make([]influxClient.Point, len(NestDevices.Device))
-
+		wCount := 0
 		for i, device := range NestDevices.Device {
 
 			var Tags = make(map[string]string)
@@ -195,27 +195,12 @@ func WriteNest(influx *influxClient.Client, database string) {
 					Fields["hvac"] = int8(1)
 				}
 
-				pts[i] = influxClient.Point{
-					Measurement: "nest",
-					Fields:      Fields,
-					Tags:        Tags,
-					Time:        time.Now(),
-					Precision:   "rfc3339",
-				}
-				bps := influxClient.BatchPoints{
-					Points:   pts,
-					Database: database,
-				}
-				_, err = influx.Write(bps)
-				if err != nil {
-					log.Println("ERROR: Could not write data point!")
-					log.Print(bps)
-					log.Print(err)
-				} else {
-					log.Printf("Wrote thermostat metrics. Sleeping for %d minute(s).\n", Interval)
-				}
+				p := influxdb2.NewPoint("nest", Tags, Fields, time.Now())
+				influx.WritePoint(p)
+				wCount++
 			}
-			time.Sleep(time.Minute * Interval)
 		}
+		log.Printf("Wrote %d thermostat metrics. Sleeping for %d minute(s).\n", wCount, Interval)
+		time.Sleep(time.Minute * Interval)
 	}
 }
