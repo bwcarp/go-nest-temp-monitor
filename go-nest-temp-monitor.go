@@ -2,15 +2,16 @@ package main
 
 import (
 	"flag"
+	"log"
+	"time"
+
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+
 	"github.com/blakehartshorn/go-nest-temp-monitor/accuweather"
 	"github.com/blakehartshorn/go-nest-temp-monitor/configuration"
 	"github.com/blakehartshorn/go-nest-temp-monitor/nest"
 	"github.com/blakehartshorn/go-nest-temp-monitor/openweathermap"
 	"github.com/blakehartshorn/go-nest-temp-monitor/weathergov"
-	"log"
-	"time"
-
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 )
 
 func main() {

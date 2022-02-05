@@ -3,7 +3,6 @@ package accuweather
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/blakehartshorn/go-nest-temp-monitor/configuration"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,6 +10,8 @@ import (
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
+
+	"github.com/blakehartshorn/go-nest-temp-monitor/configuration"
 )
 
 // Weather - parse weather details

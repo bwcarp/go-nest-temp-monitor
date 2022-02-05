@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/blakehartshorn/go-nest-temp-monitor/configuration"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
+
+	"github.com/blakehartshorn/go-nest-temp-monitor/configuration"
 )
 
 // JSON types
@@ -154,8 +155,7 @@ func WriteNest(influx api.WriteAPI) {
 		}
 
 		wCount := 0
-		for i, device := range NestDevices.Device {
-
+		for _, device := range NestDevices.Device {
 			var Tags = make(map[string]string)
 			var Fields = make(map[string]interface{})
 
